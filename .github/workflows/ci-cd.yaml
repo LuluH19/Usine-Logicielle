@@ -1,0 +1,64 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: pip install pytest
+      - run: pytest -q
+
+  docker:
+    needs: build-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          context: .
+          tags: ghcr.io/${{ github.repository }}/ops-portal:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/ops-portal:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/ops-portal:cache,mode=max
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+      - name: Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBECONFIG_CONTENT}" > ~/.kube/config
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
+      - name: Apply manifests
+        run: |
+          sed -i "s/{{TAG}}/${GITHUB_SHA}/g" k8s/deployment.yaml
+          kubectl apply -f k8s/namespace.yaml
+          kubectl -n ops apply -f k8s/configmap.yaml
+          kubectl -n ops apply -f k8s/secret.yaml
+          kubectl -n ops apply -f k8s/deployment.yaml
+          kubectl -n ops apply -f k8s/service.yaml
+          kubectl -n ops apply -f k8s/ingress.yaml || true

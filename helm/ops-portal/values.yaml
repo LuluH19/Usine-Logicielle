@@ -1,0 +1,17 @@
+image:
+  repository: ghcr.io/your-org/ops-portal
+  tag: "1.0.0"
+
+replicaCount: 2
+
+ingress:
+  enabled: true
+  host: ops-portal.local
+
+config:
+  jwtIssuer: "ops-portal"
+  jwtAudience: "ops"
+  jwtExpSeconds: "3600"
+
+secret:
+  secretKey: "change-me-please"

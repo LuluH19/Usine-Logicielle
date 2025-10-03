@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ops-portal-config
+  namespace: ops
+data:
+  JWT_ISSUER: "ops-portal"
+  JWT_AUDIENCE: "ops"
+  JWT_EXP_SECONDS: "3600"

@@ -1,0 +1,9 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-portal
+  namespace: ops
+spec:
+  to: { kind: Service, name: ops-portal }
+  port: { targetPort: http }
+  tls: { termination: edge }
