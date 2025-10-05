@@ -175,13 +175,27 @@ ops-portal/
 
 ## 🚀 CI/CD
 
-Le pipeline GitHub Actions :
-1. Build & test (pytest)
-2. Build & push Docker image vers GHCR
-3. Deploy sur Kubernetes (branche main uniquement)
+### Workflows GitHub Actions
 
-Configuration requise :
-- Secret `KUBECONFIG_CONTENT` dans GitHub
+**1. CI Pipeline (`.github/workflows/ci.yml`)**
+- ✅ Tests sur Python 3.11 & 3.12
+- ✅ Lint (flake8 + black)
+- ✅ Build Docker avec cache GHA
+- ✅ Test de l'image Docker
+
+**2. Docker Publish (`.github/workflows/docker-publish.yml`)**
+- ✅ Push vers `ghcr.io/LuluH19/Usine-Logicielle/ops-portal`
+- ✅ Multi-platform (amd64, arm64)
+- ✅ Scan de vulnérabilités (Trivy)
+- ✅ Tags automatiques (latest, sha, version)
+
+**Déclencheurs :**
+- Push vers `main` ou `develop`
+- Pull requests
+- Tags `v*.*.*`
+- Manuel (workflow_dispatch)
+
+**Documentation :** Voir `DOCKER_BUILD_FIX.md` pour la configuration du cache Docker
 
 ## 🔐 Sécurité
 
