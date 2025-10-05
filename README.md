@@ -96,10 +96,55 @@ curl -X POST http://localhost:8080/api/deploy \
 
 ## 🧪 Tests
 
+### Exécuter les tests
+
 ```bash
-pip install pytest
-pytest -q
+# Avec Docker (RECOMMANDÉ)
+docker build -t ops-portal:test .
+docker run --rm ops-portal:test pytest -v
+
+# Avec Python local (si pip installé)
+pip install -r requirements.txt
+pytest -v
+
+# Avec coverage
+pytest --cov=app --cov-report=html
 ```
+
+### Tests disponibles
+
+- **13 tests** au total
+- `tests/test_auth.py` : 10 tests d'authentification et autorisation
+- `tests/test_health.py` : 3 tests des endpoints de santé
+
+**Documentation** : Voir `PYTEST_FIX.md` et `TESTING.md`
+
+## 📖 Documentation Swagger/OpenAPI
+
+### Tester l'API avec Swagger
+
+**3 méthodes disponibles :**
+
+1. **Swagger Editor (EN LIGNE)** ⭐ RECOMMANDÉ
+   - Ouvrir : [https://editor.swagger.io](https://editor.swagger.io)
+   - Copier le contenu de `openapi.yaml`
+   - Coller dans l'éditeur
+   - Sélectionner serveur `http://localhost:8080`
+
+2. **Swagger UI Docker (LOCAL)**
+   ```bash
+   docker run -d --name swagger-ui -p 8081:8080 \
+     -e SWAGGER_JSON=/openapi.yaml \
+     -v ${PWD}/openapi.yaml:/openapi.yaml \
+     swaggerapi/swagger-ui
+   # Accès : http://localhost:8081
+   ```
+
+3. **Postman** ⭐ TESTS AUTOMATIQUES
+   - Importer `postman/ops-portal.postman_collection.json`
+   - Importer `postman/ops-portal.postman_environment.json`
+
+**Documentation détaillée** : `SWAGGER_README.md`, `SWAGGER_TESTING.md`, `docs/SWAGGER_QUICKSTART.md`
 
 ## 🔧 Makefile
 
