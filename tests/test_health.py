@@ -34,4 +34,3 @@ def test_root_endpoint(client):
     assert "api" in data["endpoints"]
     assert "health" in data["endpoints"]
     assert "metrics" in data["endpoints"]
-

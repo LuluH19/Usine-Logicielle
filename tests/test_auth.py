@@ -1,7 +1,6 @@
 """
 Tests for authentication endpoints
 """
-import pytest
 
 
 def test_login_alice_ok(client):
@@ -95,4 +94,3 @@ def test_api_deploy_with_admin_ok(client, auth_headers):
     data = response.get_json()
     assert "deployment_run_id" in data
     assert data["deployment_run_id"].startswith("run-")
-

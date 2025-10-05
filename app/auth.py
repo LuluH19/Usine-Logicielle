@@ -1,4 +1,5 @@
-import time, jwt
+import time
+import jwt
 from flask import Blueprint, request, jsonify, current_app
 from functools import wraps
 
@@ -6,8 +7,9 @@ auth_bp = Blueprint("auth", __name__)
 
 USERS = {
     "alice": {"password": "alice123", "roles": ["ops"]},
-    "admin": {"password": "admin123", "roles": ["admin","ops"]},
+    "admin": {"password": "admin123", "roles": ["admin", "ops"]},
 }
+
 
 def generate_token(sub, roles):
     now = int(time.time())
@@ -20,6 +22,7 @@ def generate_token(sub, roles):
         "roles": roles,
     }
     return jwt.encode(payload, current_app.config["SECRET_KEY"], algorithm="HS256")
+
 
 @auth_bp.post("/login")
 def login():
@@ -78,14 +81,15 @@ def login():
     token = generate_token(data["username"], user["roles"])
     return jsonify({"token": token})
 
+
 def requires_roles(*required):
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            auth = request.headers.get("Authorization","")
+            auth = request.headers.get("Authorization", "")
             if not auth.startswith("Bearer "):
                 return {"error": "missing token"}, 401
-            token = auth.split(" ",1)[1]
+            token = auth.split(" ", 1)[1]
             try:
                 payload = jwt.decode(
                     token,
@@ -96,7 +100,7 @@ def requires_roles(*required):
                 )
             except Exception as e:
                 return {"error": str(e)}, 401
-            roles = payload.get("roles",[])
+            roles = payload.get("roles", [])
             if required and not any(r in roles for r in required):
                 return {"error": "forbidden"}, 403
             return fn(*args, **kwargs)

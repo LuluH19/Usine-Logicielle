@@ -6,6 +6,7 @@ from .services.monitor import get_status
 
 api_bp = Blueprint("api", __name__)
 
+
 @api_bp.get("/status")
 @requires_roles("ops")
 def status():
@@ -85,6 +86,7 @@ def status():
         "artifacts": list_artifacts(),
         "monitor": get_status(),
     }
+
 
 @api_bp.post("/deploy")
 @requires_roles("admin")

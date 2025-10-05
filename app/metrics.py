@@ -3,6 +3,7 @@ from flask import Response
 
 http_requests = Counter("ops_http_requests_total", "Count HTTP requests", ["endpoint"])
 
+
 def init_metrics(app):
     @app.before_request
     def _count():

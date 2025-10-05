@@ -3,6 +3,7 @@ from .metrics import init_metrics
 from .auth import auth_bp
 from .api import api_bp
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_mapping(
@@ -13,7 +14,7 @@ def create_app():
     )
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(api_bp,  url_prefix="/api")
+    app.register_blueprint(api_bp, url_prefix="/api")
 
     @app.get("/")
     def index():
